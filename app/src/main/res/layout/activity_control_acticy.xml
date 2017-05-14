@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.brikerman.dlnademo.ControlActicy">
+    <Button
+        android:id="@+id/btnPlay"
+        android:layout_width="104dp"
+        android:layout_height="46dp"
+        android:text="Play"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <Button
+        android:id="@+id/btnPause"
+        android:layout_width="106dp"
+        android:layout_height="50dp"
+        android:text="Pause"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/btnPlay"
+        app:layout_constraintLeft_toLeftOf="@+id/btnPlay" />
+
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="108dp"
+        android:layout_height="46dp"
+        android:text="Stop"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="@+id/btnPlay"
+        app:layout_constraintTop_toBottomOf="@+id/btnPause" />
+
+    <Button
+        android:id="@+id/btnSetURI"
+        android:layout_width="107dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="0dp"
+        android:text="SetURI"
+        app:layout_constraintLeft_toLeftOf="@+id/btnPlay"
+        app:layout_constraintTop_toBottomOf="@+id/btnStop" />
+</android.support.constraint.ConstraintLayout>

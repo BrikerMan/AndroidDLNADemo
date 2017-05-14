@@ -1,16 +1,18 @@
 package com.example.brikerman.dlnademo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 
 import com.eliyar.bfdlna.DLNADeviceScanListener;
 import com.eliyar.bfdlna.DLNAManager;
-import com.eliyar.bfdlna.SSDP.Device;
+import com.eliyar.bfdlna.SSDP.SSDPDevice;
 
 import java.util.ArrayList;
 
@@ -19,7 +21,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DLNAManager manager;
     private ListView mListView;
 
-    private ArrayList<Device> devices = new ArrayList<Device>();
+//    private ArrayList<SSDPDevice> devices = new ArrayList<SSDPDevice>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,18 +31,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mListView = (ListView) findViewById(R.id.device_list_view);
         findViewById(R.id.btnSearch).setOnClickListener(this);
 
-        manager = new DLNAManager((WifiManager) getSystemService(WIFI_SERVICE));
-        manager.setScanDeviceListener(this);
+        manager = DLNAManager.getInstance();
         try {
-            manager.start();
+            WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+            manager.start(wifiManager);
+            manager.setScanDeviceListener(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        DeviceListAdapter adapter = new DeviceListAdapter(this, devices);
+        final DeviceListAdapter adapter = new DeviceListAdapter(this, manager.devices);
         mListView.setAdapter(adapter);
 
-//        final Context context = this;
+        final Context context = this;
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // 1
+                SSDPDevice device= manager.devices.get(position);
+                // 2
+                Intent detailIntent = new Intent(context, ControlActicy.class);
+                // 3
+                detailIntent.putExtra("device", device);
+                // 4
+                startActivity(detailIntent);
+            }
+        });
+
+
     }
 
     @Override
@@ -54,16 +73,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void didFoundDevice(Device device) {
-        this.devices = manager.devices;
+    public void didFoundDevice(SSDPDevice SSDPDevice) {
+
 
         final Context context = this;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                DeviceListAdapter adapter = new DeviceListAdapter(context, devices);
+                DeviceListAdapter adapter = new DeviceListAdapter(context, manager.devices);
                 mListView.setAdapter(adapter);
-
             }
         });
 

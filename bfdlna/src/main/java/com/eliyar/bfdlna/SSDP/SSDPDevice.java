@@ -6,24 +6,19 @@ import com.eliyar.bfdlna.XMLParser;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -32,33 +27,54 @@ import okhttp3.Response;
  * Created by brikerman on 2017/5/13.
  */
 
-public class Device {
-    private static final String TAG = "DLNA SSDP Device";
+public class SSDPDevice implements Serializable {
+    private static final String TAG = "DLNA SSDP SSDPDevice";
 
-    /// URL链接
+    /**
+     * 服务描述文件 URL
+     */
     public URL location = null;
 
-    /// 服务器IP
+    /**
+     * 服务器 IP
+     */
     String host = null;
 
-    /// 服务基础地址
+    /**
+     * 服务基础地址
+     */
     public String baseURL = null;
 
     public String uuid = "";
+
+
     public String friendlyName = "";
 
-    List<Service> services = new ArrayList<Service>();
+    /**
+     * 原始 SSDP 字典
+     */
+    public HashMap<String, String> info = new HashMap<String, String>();
+
+    public List<SSDPService> services = new ArrayList<SSDPService>();
 
     public Boolean isValid() {
         return location != null;
     }
 
-    public Device(String msg) {
+    public SSDPDevice() { }
+
+    public SSDPDevice(String msg) {
         String lines[] = msg.split("\\r?\\n");
         for(String line : lines ) {
             String parse[] = line.split(": ");
             if (parse[0] != null) {
-                switch (parse[0].toUpperCase()){
+                String key = parse[0].toUpperCase();
+                if (parse.length > 1) {
+                    if (parse[1].toString() != null) {
+                        info.put(key, parse[1].toString());
+                    }
+                }
+                switch (key){
                     case "LOCATION":
                         if (parse[1].toString() != null) {
                             try {
@@ -78,8 +94,7 @@ public class Device {
         }
     }
 
-
-    public void startParseXML(final DeviceInfoListener listener) throws Exception {
+    public void startParseXML(final SSDPDeviceInfoListener listener) throws Exception {
         final OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -106,46 +121,47 @@ public class Device {
                     uuid = parser.getValue(device, "UDN");
                     NodeList servicesList = device.getElementsByTagName("service");
                     for (int i = 0; i < servicesList.getLength(); i++) {
-                        Service service = new Service((Element) servicesList.item(i), baseURL);
+                        SSDPService service = new SSDPService((Element) servicesList.item(i), baseURL);
                         services.add(service);
                     }
                 }
                 if (!services.isEmpty()) {
-                    listener.finishParseServices(Device.this);
+                    listener.finishParseServices(SSDPDevice.this);
                 }
             }
         });
     }
 
-//    private String parseBaseLocaiton() {
-//        if (location != null) {
-//            URL url = location;
-//            String proto = url.getProtocol();
-//            String host = url.getHost();
-//            int port = url.getPort();
-//
-//            // if the port is not explicitly specified in the input, it will be -1.
-//            if (port != -1) {
-//                return String.format("%s://%s", proto, host);
-//            } else {
-//                return String.format("%s://%s:%d", proto, host, port);
-//            }
+//    public static void main(String [] args) {
+//        SSDPDevice d = new SSDPDevice();
+//        try {
+//            FileOutputStream fileOut = new FileOutputStream("/tmp/ssdpDevice.ser");
+//            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+//            out.writeObject(d);
+//            out.close();
+//            fileOut.close();
+//            System.out.printf("Serialized data is saved in /tmp/employee.ser");
+//        } catch(IOException i) {
+//            i.printStackTrace();
 //        }
 //    }
+
+
 
     @Override
     public String toString() {
         if (location == null) {
-            return "==========SSDP Null Device=========";
+            return "==========SSDP Null SSDPDevice=========";
         } else {
             String decs = "==========SSDPDevice=========" + "\n" +
+                    "friendlyName :" + this.friendlyName + "\n" +
                     "location     :" + this.location + "\n" +
 //                    "version      :" + this.version + "\n" +
 //                    "uuid         :" + this.uuid + "\n" +
-//                    "friendlyName :" + this.friendlyName + "\n" +
+
                     "services:";
 
-            for (Service ser: services) {
+            for (SSDPService ser: services) {
                 decs = decs + ser.toString();
             }
 

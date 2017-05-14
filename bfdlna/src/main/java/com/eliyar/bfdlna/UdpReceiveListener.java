@@ -7,5 +7,10 @@ import java.net.InetAddress;
  */
 
 public interface UdpReceiveListener {
-    public void receive(InetAddress address, String msg);
+    /**
+     * udp 服务收到消息
+     * @param address   发送消息 ip
+     * @param msg       接收到的消息
+     */
+    public void udpReceive(InetAddress address, String msg);
 }

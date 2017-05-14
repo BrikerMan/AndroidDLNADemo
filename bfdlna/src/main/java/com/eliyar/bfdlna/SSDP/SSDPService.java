@@ -1,35 +1,35 @@
 package com.eliyar.bfdlna.SSDP;
 
-import android.util.Log;
-
 import com.eliyar.bfdlna.XMLParser;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
+import java.io.Serializable;
 import java.net.URL;
 
 /**
  * Created by brikerman on 2017/5/13.
  */
 
-public class Service {
+public class SSDPService implements Serializable {
     /// 服务类型
-    ServiceType serviceType = null;
+    public SSDPServiceType serviceType = null;
     /// 服务表示符
-    String serviceId = null;
+    public String serviceId = null;
     /// 获取服务描述文档URL
-    URL SCPDURL = null;
+    public URL SCPDURL = null;
     /// 发出控制消息URL
-    URL controlURL = null;
+    public URL controlURL = null;
     /// 订阅该服务事件URL
-    URL eventSubURL = null;
+    public URL eventSubURL = null;
 
-    public Service(Element node, String base) {
+    public SSDPService(Element node, String base) {
         XMLParser parser = new XMLParser();
 
         String typeString = parser.getValue(node, "serviceType");
-//        serviceType = ServiceType.valueOf(typeString);
+        if (typeString != null) {
+            serviceType = SSDPServiceType.getWithString(typeString);
+        }
 
         serviceId = parser.getValue(node, "serviceId");
 
@@ -60,10 +60,10 @@ public class Service {
     @Override
     public String toString() {
         return "---------\n"		+
-                "      serviceId      " + this.serviceId   + "\n" +
-                "      serviceType    " + this.serviceType + "\n" +
-                "      SCPDURL        " + this.SCPDURL     + "\n" +
-                "      controlURL     " + this.controlURL  + "\n" +
-                "      eventSubURL    " + this.eventSubURL + "\n";
+                "      serviceId       " + this.serviceId   + "\n" +
+                "      SSDPServiceType " + this.serviceType + "\n" +
+                "      SCPDURL         " + this.SCPDURL     + "\n" +
+                "      controlURL      " + this.controlURL  + "\n" +
+                "      eventSubURL     " + this.eventSubURL + "\n";
     }
 }

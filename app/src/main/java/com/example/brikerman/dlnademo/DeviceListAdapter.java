@@ -1,8 +1,6 @@
 package com.example.brikerman.dlnademo;
 
 import android.content.Context;
-import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.eliyar.bfdlna.SSDP.Device;
+import com.eliyar.bfdlna.SSDP.SSDPDevice;
 
 import java.util.ArrayList;
 
@@ -22,9 +20,9 @@ import java.util.ArrayList;
 public class DeviceListAdapter extends BaseAdapter {
     private Context mContext;
     private LayoutInflater mInflater;
-    private ArrayList<Device> mDataSource;
+    private ArrayList<SSDPDevice> mDataSource;
 
-    public DeviceListAdapter(Context context, ArrayList<Device> items) {
+    public DeviceListAdapter(Context context, ArrayList<SSDPDevice> items) {
         mContext = context;
         mDataSource = items;
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -68,10 +66,10 @@ public class DeviceListAdapter extends BaseAdapter {
         TextView detailTextView = holder.detailTextView;
 
 
-        Device device = (Device) getItem(i);
+        SSDPDevice SSDPDevice = (SSDPDevice) getItem(i);
 
-        titleTextView.setText(device.friendlyName);
-        subtitleTextView.setText(device.uuid);
+        titleTextView.setText(SSDPDevice.friendlyName);
+        subtitleTextView.setText(SSDPDevice.uuid);
 //        detailTextView.setText(receipe.label);
 
 

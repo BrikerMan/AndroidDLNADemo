@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -52,7 +51,7 @@ public class UdpHelper {
             @Override
             public void run() {
                 try {
-                    mDatagramSocket = new DatagramSocket(8992);
+                    mDatagramSocket = new DatagramSocket();
                     mDatagramSocket.setBroadcast(true);
                     mDatagramSocket.setReuseAddress(true);
                     byte[] data=new byte[packetLength];
@@ -71,25 +70,9 @@ public class UdpHelper {
                             lock.release();
                         }
                     }
-
-                    byte[] b = new byte[1024];
-                    DatagramPacket dgram = new DatagramPacket(b, b.length);
-                    MulticastSocket socket = new MulticastSocket(1900); // must bind receive side
-                    socket.joinGroup(multicastAddress);
-
-                    while(true) {
-                        socket.receive(dgram); // blocks until a datagram is received
-                        System.err.println("Received " + dgram.getLength() +
-                                " bytes from " + dgram.getAddress());
-                        dgram.setLength(b.length); // must reset length field!
-                    }
-
-                } catch (SocketException e) {
+                    Log.v(TAG, "Stared UPD Server @" + mDatagramSocket.getPort());
+                } catch (Exception e) {
                     e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally{
-
                 }
             }
         }).start();
@@ -111,6 +94,7 @@ public class UdpHelper {
             public void run() {
                 try {
                     byte[] messageByte = msg.getBytes();
+
                     DatagramPacket p = new DatagramPacket(messageByte, messageByte.length);
                     p.setAddress(address);
                     p.setPort(port);
@@ -174,6 +158,6 @@ class ReceiveThread extends Thread{
 
     @Override
     public void run() {
-        listener.receive(address, msg);
+        listener.udpReceive(address, msg);
     }
 }
