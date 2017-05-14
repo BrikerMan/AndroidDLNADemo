@@ -22,7 +22,7 @@ public enum ServiceType {
     UPnP_ContentDirectory1("urn:schemas-upnp-org:service:ContentDirectory:1"),
     UPnP_RenderingControl1("urn:schemas-upnp-org:service:RenderingControl:1"),
     UPnP_ConnectionManager1("urn:schemas-upnp-org:service:ConnectionManager:1"),
-    UPnP_AVTransport1 ("urn:schemas-upnp-org:service:AVTransport:1"),
+    UPnP_AVTransport1("urn:schemas-upnp-org:service:AVTransport:1"),
 
     // UPnP Microsoft A/V profile
     Microsoft_MediaReceiverRegistrar1("urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1"),

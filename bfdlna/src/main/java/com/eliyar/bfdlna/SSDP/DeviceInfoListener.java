@@ -5,5 +5,5 @@ package com.eliyar.bfdlna.SSDP;
  */
 
 public interface DeviceInfoListener {
-    public void finishParseServices();
+    public void finishParseServices(Device device);
 }
