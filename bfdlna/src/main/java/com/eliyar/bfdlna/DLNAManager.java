@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import com.eliyar.bfdlna.Exceptions.WifiDisableException;
 import com.eliyar.bfdlna.SSDP.SSDPDevice;
 import com.eliyar.bfdlna.SSDP.SSDPDeviceInfoListener;
-import com.eliyar.bfdlna.SSDP.SSDPService;
 import com.eliyar.bfdlna.SSDP.SSDPServiceType;
 import com.eliyar.bfdlna.Services.AVTransportManager;
 
@@ -24,16 +22,10 @@ public class DLNAManager implements UdpReceiveListener, SSDPDeviceInfoListener {
 
     public ArrayList<SSDPDevice> devices = new ArrayList<SSDPDevice>();
     public ArrayList<String> devicesURLs = new ArrayList<String>();
-
-    public AVTransportManager avTransport;
-
     public SSDPDevice mCuurentDevice;
 
     private UdpHelper mUdpHelper;
-
     private SSDPServiceType targetType = SSDPServiceType.UPnP_AVTransport1;
-    private WifiManager wifiManager;
-
     private DLNADeviceScanListener scanDeviceListener;
 
     /**
@@ -50,41 +42,50 @@ public class DLNAManager implements UdpReceiveListener, SSDPDeviceInfoListener {
     }
 
     /**
-     * 服务器启动
-     * @param manager    网络控制器，用于检测网络环境
+     * 服务启动，启动后自动开始搜索
      * @throws Exception
      */
-    public void start(WifiManager manager) throws Exception {
-        wifiManager = manager;
-        mUdpHelper = new UdpHelper(wifiManager);
+    public void start() {
+        mUdpHelper = new UdpHelper();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-                try {
-                    mUdpHelper.stopListen();
-                    mUdpHelper.startListen(DLNAManager.this);
-                    fireSearchRequest();
-                } catch (WifiDisableException e) {
-                    e.printStackTrace();
-                }
+                mUdpHelper.stopListen();
+                mUdpHelper.startListen(DLNAManager.this);
+                fireSearchRequest();
             }
         }).start();
     }
 
+    /**
+     * 建议网络环境发生变化后调用
+     */
+    public void reset() {
+        mUdpHelper.reset();
+        refreshDevices();
+    }
+
+    /**
+     * 设置设备搜索结果回调
+     * @param listener 回调接口
+     */
     public void setScanDeviceListener(DLNADeviceScanListener listener) {
         scanDeviceListener = listener;
     }
 
+    /**
+     * 选中设备，用于后续操作
+     * @param device 设备
+     */
     public void setCurrentDevice(SSDPDevice device) {
         mCuurentDevice = device;
     }
 
+    /**
+     * 获取媒体控制类实例，用于播放暂停投屏等操作
+     * @return AVTransportManager 实例
+     */
     public AVTransportManager getAVTransportManager() {
         if (mCuurentDevice != null) {
             return new AVTransportManager(mCuurentDevice);

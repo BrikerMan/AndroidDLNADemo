@@ -44,9 +44,7 @@ public class AVTransportManager {
     public static String ABS_TIME = "AbsTime";
     public static String REL_TIME = "RelTime";
 
-
     public SSDPService service;
-
     private DLNARequestCallBack callBack;
 
     public AVTransportManager(SSDPDevice device) {
@@ -61,10 +59,20 @@ public class AVTransportManager {
         this.callBack = callBack;
     }
 
+    /**
+     * 投媒体资源
+     * @param uri   资源 uri
+     */
     public void SetAVTransportURI(String uri) {
         SetAVTransportURI(uri, "", "");
     }
 
+    /**
+     * 投媒体资源
+     * @param uri   资源 uri
+     * @param title 资源标题
+     * @param meta  资源meta信息
+     */
     public void SetAVTransportURI(String uri, String title, String meta) {
         Log.d("AVTransportManager", "SetAVTransportURI");
         try {
@@ -95,6 +103,9 @@ public class AVTransportManager {
         }
     }
 
+    /**
+     * 播放
+     */
     public void play() {
         Log.d("AVTransportManager", "play");
         try {
@@ -198,6 +209,9 @@ public class AVTransportManager {
         }
     }
 
+    /**
+     * 获取媒体播放进度状态
+     */
     public void getPositionInfo() {
         Log.d("AVTransportManager", "GetPositionInfo");
         try {
@@ -222,6 +236,9 @@ public class AVTransportManager {
         }
     }
 
+    /**
+     * 获取媒体传输状态
+     */
     public void getTransportInfo() {
         Log.d("AVTransportManager", "GetTransportInfo");
         try {
@@ -243,18 +260,18 @@ public class AVTransportManager {
         }
     }
 
-    public void fireReques(String xml, String action) {
+    private void fireReques(String xml, String action) {
         Log.d("AVTransportManager", "fireReques" + xml);
         OkHttpClient client = new OkHttpClient();
 
-        MediaType mediaType = MediaType.parse("application/xml");
+        MediaType mediaType = MediaType.parse("text/xml; charset=\"utf-8\"");
         RequestBody body = RequestBody.create(mediaType, xml);
 
         Request request = new Request.Builder()
                 .url(service.controlURL)
                 .post(body)
-                .addHeader("content-type", "application/xml")
-                .addHeader("soapaction", service.serviceType.decs + "#" + action)
+                .addHeader("content-type", "text/xml; charset=\"utf-8\"")
+                .addHeader("SOAPAction", "\"" + service.serviceType.decs + "#" + action + "\"")
                 .build();
         Call call = client.newCall(request);
 
@@ -345,7 +362,7 @@ public class AVTransportManager {
         });
     }
 
-    public String prepareXML(final Element command) {
+    private String prepareXML(final Element command) {
         String envelopeTop = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n" +
                 "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>";
         String envelopeEnd = "</s:Body></s:Envelope>";
@@ -353,7 +370,7 @@ public class AVTransportManager {
         return envelopeTop + getNodeString(command) + envelopeEnd;
     }
 
-    String getNodeString(Node node) {
+    private String getNodeString(Node node) {
         try {
             StringWriter writer = new StringWriter();
             Transformer transformer = TransformerFactory.newInstance().newTransformer();

@@ -33,8 +33,14 @@ public class ControlActicy extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_control_acticy);
 
         Intent intent = getIntent();
+
+        // 设置要操作的设备
         device = (SSDPDevice) intent.getSerializableExtra("device");
         DLNAManager.getInstance().setCurrentDevice(device);
+
+
+
+
         findViewById(R.id.btnSetURI).setOnClickListener(this);
         findViewById(R.id.btnPause).setOnClickListener(this);
         findViewById(R.id.btnPlay).setOnClickListener(this);
@@ -54,7 +60,7 @@ public class ControlActicy extends AppCompatActivity implements View.OnClickList
             case R.id.btnSetURI:
                 AVTransportManager manager = DLNAManager.getInstance().getAVTransportManager();
                 /**
-                 * 如果需要关注结果，则需要实现协议；
+                 * 如果需要关注请求结果，则需要实现协议；
                  */
                 manager.setCallBack(new DLNARequestCallBack() {
                     @Override
@@ -65,6 +71,7 @@ public class ControlActicy extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onSuccess(HashMap<String,String> info) {
                         Log.d("ControlActicy", "onSuccess");
+                        getPosition();
                     }
                 });
                 manager.SetAVTransportURI("http://baobab.wdjcdn.com/1455968234865481297704.mp4");
@@ -86,35 +93,7 @@ public class ControlActicy extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.btnGetPosition:
-                AVTransportManager manager4 = DLNAManager.getInstance().getAVTransportManager();
-                manager4.setCallBack(new DLNARequestCallBack() {
-                    @Override
-                    public void onFailure() {
-                        Log.e("ControlActicy", "onFailure");
-                    }
-
-                    @Override
-                    public void onSuccess(final HashMap<String,String> info) {
-                        Log.d("ControlActicy", info.toString());
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                currentTimeLabel.setText(info.get(AVTransportManager.REL_TIME));
-                                totalDurationlabel.setText(info.get(AVTransportManager.TRACK_DURATION));
-
-                                Integer realTime = Utils.convertStringToSecond(info.get(AVTransportManager.REL_TIME));
-                                Integer duration = Utils.convertStringToSecond(info.get(AVTransportManager.TRACK_DURATION));
-                                totalDuration = duration;
-                                int progress = (int) ((double) realTime / (double) duration * 100);
-                                Log.v("tttt", " " + progress);
-
-                                seekBar.setProgress(progress);
-                            }
-                        });
-                    }
-                });
-                manager4.getPositionInfo();
+                getPosition();
                 break;
 
             default:
@@ -122,9 +101,42 @@ public class ControlActicy extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    // 获取媒体进度
+    private void getPosition() {
+        AVTransportManager manager4 = DLNAManager.getInstance().getAVTransportManager();
+        manager4.setCallBack(new DLNARequestCallBack() {
+            @Override
+            public void onFailure() {
+                Log.e("ControlActicy", "onFailure");
+            }
+
+            @Override
+            public void onSuccess(final HashMap<String,String> info) {
+                Log.d("ControlActicy", info.toString());
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 通过字典 info 获取一些信息
+                        currentTimeLabel.setText(info.get(AVTransportManager.REL_TIME));
+                        totalDurationlabel.setText(info.get(AVTransportManager.TRACK_DURATION));
+
+                        Integer realTime = Utils.convertStringToSecond(info.get(AVTransportManager.REL_TIME));
+                        Integer duration = Utils.convertStringToSecond(info.get(AVTransportManager.TRACK_DURATION));
+                        totalDuration = duration;
+                        int progress = (int) ((double) realTime / (double) duration * 100);
+                        Log.v("tttt", " " + progress);
+
+                        seekBar.setProgress(progress);
+                    }
+                });
+            }
+        });
+        manager4.getPositionInfo();
+    }
+
     public void onProgressChanged(SeekBar seekBar, int progress,
                                   boolean fromUser) {
-//        Log.v("ddd", "" + seekBar.getProgress());
 
     }
 

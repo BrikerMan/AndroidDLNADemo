@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -31,14 +32,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mListView = (ListView) findViewById(R.id.device_list_view);
         findViewById(R.id.btnSearch).setOnClickListener(this);
 
+        // 初始化 DLNA 单例
         manager = DLNAManager.getInstance();
-        try {
-            WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
-            manager.start(wifiManager);
-            manager.setScanDeviceListener(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        manager.start();
+        manager.setScanDeviceListener(this);
 
         final DeviceListAdapter adapter = new DeviceListAdapter(this, manager.devices);
         mListView.setAdapter(adapter);
@@ -73,8 +70,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void didFoundDevice(SSDPDevice SSDPDevice) {
-
-
         final Context context = this;
         runOnUiThread(new Runnable() {
             @Override
