@@ -3,6 +3,7 @@ package com.eliyar.bfdlna;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import java.util.Date;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -10,6 +11,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.security.Timestamp;
+
 import com.eliyar.bfdlna.Exceptions.SendStateListener;
 import com.eliyar.bfdlna.Exceptions.WifiDisableException;
 
@@ -34,12 +37,22 @@ public class UdpHelper {
     private DatagramSocket mDatagramSocket;
 
     public UdpHelper(WifiManager manager) {
-        this.lock = manager.createMulticastLock("UDPwifi");
-        this.wifiManager=manager;
 
+
+        this.lock = manager.createMulticastLock("UDP" + System.currentTimeMillis());
+        this.wifiManager=manager;
         try {
             this.multicastAddress = InetAddress.getByName("239.255.255.250");
         } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createSocket() {
+        try {
+            mDatagramSocket = new DatagramSocket();
+            mDatagramSocket.setBroadcast(true);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -51,9 +64,7 @@ public class UdpHelper {
             @Override
             public void run() {
                 try {
-                    mDatagramSocket = new DatagramSocket();
-                    mDatagramSocket.setBroadcast(true);
-                    mDatagramSocket.setReuseAddress(true);
+                    createSocket();
                     byte[] data=new byte[packetLength];
                     while(listening){
                         DatagramPacket datagramPacket=new DatagramPacket(data,data.length);
@@ -89,10 +100,10 @@ public class UdpHelper {
 
     public void send(final InetAddress address, final int port, final String msg){
         new Thread(new Runnable() {
-
             @Override
             public void run() {
                 try {
+
                     byte[] messageByte = msg.getBytes();
 
                     DatagramPacket p = new DatagramPacket(messageByte, messageByte.length);

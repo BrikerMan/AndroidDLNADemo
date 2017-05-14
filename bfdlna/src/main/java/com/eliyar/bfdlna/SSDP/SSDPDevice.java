@@ -132,22 +132,6 @@ public class SSDPDevice implements Serializable {
         });
     }
 
-//    public static void main(String [] args) {
-//        SSDPDevice d = new SSDPDevice();
-//        try {
-//            FileOutputStream fileOut = new FileOutputStream("/tmp/ssdpDevice.ser");
-//            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-//            out.writeObject(d);
-//            out.close();
-//            fileOut.close();
-//            System.out.printf("Serialized data is saved in /tmp/employee.ser");
-//        } catch(IOException i) {
-//            i.printStackTrace();
-//        }
-//    }
-
-
-
     @Override
     public String toString() {
         if (location == null) {

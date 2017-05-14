@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // 1
                 SSDPDevice device= manager.devices.get(position);
                 // 2
                 Intent detailIntent = new Intent(context, ControlActicy.class);
