@@ -287,7 +287,7 @@ public class AVTransportManager {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                final String xml = response.body().string();
+                final String xml = response.body().string().replaceAll("\n", "");
                 Log.v("response ", "onResponse(): " + xml);
 
 
